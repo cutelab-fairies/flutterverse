@@ -1,0 +1,161 @@
+import org.lwjgl.BufferUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.nio.FloatBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.lwjgl.opengl.GL33.*;
+
+public class Model {
+    private int bufferUsage;
+
+    // open gl stuff
+    private int vao = glGenVertexArrays();
+
+    private int posVbo = glGenBuffers();
+    private int uvVbo = glGenBuffers();
+
+    private FloatBuffer posVboBuffer;
+    private FloatBuffer uvVboBuffer;
+
+    // my model stuff
+    private int vertexCount;
+    List<util.Vec3> pos = new ArrayList<>();
+    List<util.Vec2> uv = new ArrayList<>();
+
+    public void addVertex(util.Vec3 pos, util.Vec2 uv) {
+        this.pos.add(pos);
+        this.uv.add(uv);
+    }
+
+    public void addTriangle(
+            util.Vec3 v1, util.Vec2 uv1,
+            util.Vec3 v2, util.Vec2 uv2,
+            util.Vec3 v3, util.Vec2 uv3
+    ) {
+        addVertex(v1, uv1);
+        addVertex(v2, uv2);
+        addVertex(v3, uv3);
+    }
+
+    public void loadObj(String location) throws IOException, URISyntaxException {
+        // definitely not the best way lol, but assimp is a little tricky to use.
+        // ill have to look into it another time once i have scenes.
+
+        String obj = new String(Flutterverse.class.getResourceAsStream(location).readAllBytes());
+        BufferedReader reader = new BufferedReader(new StringReader(obj));
+
+        List<util.Vec3> pos = new ArrayList<>();
+        List<util.Vec2> uv = new ArrayList<>();
+
+        String line = null;
+        while((line=reader.readLine()) != null) {
+            String attr[] = line.split(" "); // attributes?
+            switch (attr[0]) {
+                case "v":
+                    pos.add(new util.Vec3(
+                        Float.valueOf(attr[1]),
+                        Float.valueOf(attr[2]),
+                        Float.valueOf(attr[3])
+                    ));
+                    break;
+                case "vt":
+                    uv.add(new util.Vec2(
+                        Float.valueOf(attr[1]),
+                        Float.valueOf(attr[2])
+                    ));
+                    break;
+                case "f":
+                    // there are 3 sets of 3 indicies for pos, uv and normal
+                    // f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3
+
+                    // each v array is: pos, uv, normal
+                    String iv1[] = attr[1].split("/");
+                    int v1[] = {
+                        Integer.valueOf(iv1[0])-1,
+                        Integer.valueOf(iv1[1])-1,
+                        //Integer.valueOf(iv1[2])-1,
+                    };
+
+                    String iv2[] = attr[2].split("/");
+                    int v2[] = {
+                        Integer.valueOf(iv2[0])-1,
+                        Integer.valueOf(iv2[1])-1,
+                        //Integer.valueOf(iv2[2])-1,
+                    };
+
+                    String iv3[] = attr[3].split("/");
+                    int v3[] = {
+                        Integer.valueOf(iv3[0])-1,
+                        Integer.valueOf(iv3[1])-1,
+                        //Integer.valueOf(iv3[2])-1,
+                    };
+
+                    addTriangle(
+                        pos.get(v1[0]), uv.get(v1[1]),
+                        pos.get(v2[0]), uv.get(v2[1]),
+                        pos.get(v3[0]), uv.get(v3[1])
+                    );
+                break;
+            }
+        }
+
+        System.out.println("Loaded obj with "+pos.size()+" verticies, "+uv.size()+" uvs");
+    }
+
+    public void make() {
+        if (pos.size() != uv.size()) return;
+
+        // verticies to vbo buffer
+        vertexCount = pos.size();
+
+        posVboBuffer = BufferUtils.createFloatBuffer(pos.size()*3);
+        uvVboBuffer = BufferUtils.createFloatBuffer(uv.size()*2);
+
+        pos.forEach(pos -> posVboBuffer.put(pos.x).put(pos.y).put(pos.z));
+        uv.forEach(uv -> uvVboBuffer.put(uv.x).put(uv.y));
+
+        posVboBuffer.flip();
+        uvVboBuffer.flip();
+
+        // opengl
+        glBindVertexArray(vao);
+
+        // positions
+        glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+        glBufferData(GL_ARRAY_BUFFER, posVboBuffer, bufferUsage);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0L); // position
+        glEnableVertexAttribArray(0);
+
+        // uv coordinates
+        glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+        glBufferData(GL_ARRAY_BUFFER, uvVboBuffer, bufferUsage);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0L); // position
+        glEnableVertexAttribArray(1);
+
+        // cleanup
+        glBindVertexArray(0);
+    }
+
+    public void draw() {
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+        glBindVertexArray(0);
+    }
+
+    public void cleanup() {
+        glDeleteVertexArrays(vao);
+        glDeleteBuffers(posVbo);
+        glDeleteBuffers(uvVbo);
+    }
+
+    public Model(int bufferUsage) {
+        this.bufferUsage = bufferUsage;
+    }
+}
