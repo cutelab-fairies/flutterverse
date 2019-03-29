@@ -1,12 +1,11 @@
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,47 +25,47 @@ public class Model {
 
     // my model stuff
     private int vertexCount;
-    List<util.Vec3> pos = new ArrayList<>();
-    List<util.Vec2> uv = new ArrayList<>();
+    List<Vector3f> pos = new ArrayList<>();
+    List<Vector2f> uv = new ArrayList<>();
 
-    public void addVertex(util.Vec3 pos, util.Vec2 uv) {
+    public void addVertex(Vector3f pos, Vector2f uv) {
         this.pos.add(pos);
         this.uv.add(uv);
     }
 
     public void addTriangle(
-            util.Vec3 v1, util.Vec2 uv1,
-            util.Vec3 v2, util.Vec2 uv2,
-            util.Vec3 v3, util.Vec2 uv3
+        Vector3f v1, Vector2f uv1,
+        Vector3f v2, Vector2f uv2,
+        Vector3f v3, Vector2f uv3
     ) {
         addVertex(v1, uv1);
         addVertex(v2, uv2);
         addVertex(v3, uv3);
     }
 
-    public void loadObj(String location) throws IOException, URISyntaxException {
+    public void loadObj(String location) throws IOException {
         // definitely not the best way lol, but assimp is a little tricky to use.
         // ill have to look into it another time once i have scenes.
 
         String obj = new String(Flutterverse.class.getResourceAsStream(location).readAllBytes());
         BufferedReader reader = new BufferedReader(new StringReader(obj));
 
-        List<util.Vec3> pos = new ArrayList<>();
-        List<util.Vec2> uv = new ArrayList<>();
+        List<Vector3f> pos = new ArrayList<>();
+        List<Vector2f> uv = new ArrayList<>();
 
         String line = null;
         while((line=reader.readLine()) != null) {
             String attr[] = line.split(" "); // attributes?
             switch (attr[0]) {
                 case "v":
-                    pos.add(new util.Vec3(
+                    pos.add(new Vector3f(
                         Float.valueOf(attr[1]),
                         Float.valueOf(attr[2]),
                         Float.valueOf(attr[3])
                     ));
                     break;
                 case "vt":
-                    uv.add(new util.Vec2(
+                    uv.add(new Vector2f(
                         Float.valueOf(attr[1]),
                         Float.valueOf(attr[2])
                     ));

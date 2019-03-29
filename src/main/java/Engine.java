@@ -119,7 +119,7 @@ public class Engine {
 
     }
 
-    private void update() throws IOException, URISyntaxException {
+    private void update() throws IOException {
         // make model
         Model triangle = new Model(GL_STATIC_DRAW);
         triangle.loadObj("models/sphere.obj");
@@ -140,6 +140,8 @@ public class Engine {
             glClear(GL_COLOR_BUFFER_BIT);
 
             shader.use();
+            shader.setUniform("iTime", (float)glfwGetTime());
+
             triangle.draw();
 
             glfwSwapBuffers(window);
@@ -154,7 +156,7 @@ public class Engine {
         glfwTerminate();
     }
 
-    public void run(Engine engine) throws IOException, URISyntaxException {
+    public void run(Engine engine) throws IOException {
         engine.initOpenGL();
         engine.update();
         engine.deinit();

@@ -4,12 +4,14 @@ layout (location = 0) in vec3 vert_pos;
 layout (location = 1) in vec2 vert_uv;
 
 out vec2 iUV;
+out vec3 iPosition;
 
 uniform vec3 iWorldPosition;
 
 void main() {
 	
 	iUV = vert_uv;
+	iPosition = vert_pos;
 
 	vec3 pos = vert_pos; 
 	
