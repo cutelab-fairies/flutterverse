@@ -1,8 +1,11 @@
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +16,8 @@ import java.util.regex.Pattern;
 import static org.lwjgl.opengl.GL33.*;
 
 public class Shader {
-    public int createShader(String location, int type) throws IOException {
-        String content = new String(Flutterverse.class.getResourceAsStream(location).readAllBytes());
+    public int createShader(String filename, int type) throws IOException {
+        String content = new String(Flutterverse.class.getResourceAsStream(filename).readAllBytes());
 
         // fill in references
         Pattern referencePattern = Pattern.compile("// <reference path=\"(.*?)\"/>");
@@ -35,7 +38,7 @@ public class Shader {
         if (result == 0) {
             String shaderLog = glGetShaderInfoLog(shader);
             if (shaderLog.trim().length() > 0) System.err.println(shaderLog);
-            throw new AssertionError("Could not compile shader! "+location);
+            throw new AssertionError("Could not compile shader! "+filename);
         }
 
         return shader;
@@ -61,8 +64,8 @@ public class Shader {
     public int program;
     private List<Integer> shaders = new ArrayList<>();
 
-    public void addShader(String location, int type) throws IOException {
-        int shader = createShader(location, type);
+    public void addShader(String filename, int type) throws IOException {
+        int shader = createShader(filename, type);
         shaders.add(shader);
     }
 
@@ -82,6 +85,10 @@ public class Shader {
     public void setUniform(String name, float v)    { glUniform1f(getUniformLocation(name), v); }
     public void setUniform(String name, Vector2f v) { glUniform2f(getUniformLocation(name), v.x, v.y); }
     public void setUniform(String name, Vector3f v) { glUniform3f(getUniformLocation(name), v.x, v.y, v.z); }
+    public void setUniform(String name, Matrix4f m) {
+        FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+        glUniformMatrix4fv(getUniformLocation(name), false, m.get(fb));
+    }
 
     private void cleanupShaders() {
         for (int shader: shaders) {

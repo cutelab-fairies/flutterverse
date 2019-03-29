@@ -43,11 +43,11 @@ public class Model {
         addVertex(v3, uv3);
     }
 
-    public void loadObj(String location) throws IOException {
+    public void loadObj(String filename) throws IOException {
         // definitely not the best way lol, but assimp is a little tricky to use.
         // ill have to look into it another time once i have scenes.
 
-        String obj = new String(Flutterverse.class.getResourceAsStream(location).readAllBytes());
+        String obj = new String(Flutterverse.class.getResourceAsStream(filename).readAllBytes());
         BufferedReader reader = new BufferedReader(new StringReader(obj));
 
         List<Vector3f> pos = new ArrayList<>();
