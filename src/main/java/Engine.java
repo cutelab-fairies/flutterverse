@@ -1,4 +1,5 @@
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -11,7 +12,7 @@ import static org.lwjgl.opengl.GL33.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Engine {
-    private String WINDOW_TITLE = "Flutterverse";
+    private String WINDOW_TITLE = "Flutterverse: THE LIVING VULPIE SHADER MACHINE";
 
     private long window;
 
@@ -20,13 +21,25 @@ public class Engine {
 
     private boolean windowFullscreen = false;
     private boolean windowWireframe = false;
+    private boolean windowLocked = true;
+
+    private Camera camera = new Camera();
 
     // glfw handling
-    private void onKey(long _window, int key, int scancode, int action, int mode) {
+    private void onKey(long window, int key, int scancode, int action, int mode) {
+        if (windowLocked == false) return;
+
+        camera.onKey(key, action);
+
         if (action == GLFW_PRESS) {
             switch (key) {
                 case GLFW_KEY_ESCAPE:
-                    glfwSetWindowShouldClose(window, true);
+                    if (windowLocked) {
+                        windowLocked = false;
+                        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    } else {
+                        glfwSetWindowShouldClose(window, true);
+                    }
                     break;
 
                 case GLFW_KEY_F11:
@@ -47,7 +60,7 @@ public class Engine {
                     }
                     break;
 
-                case GLFW_KEY_W:
+                case GLFW_KEY_F1:
                     windowWireframe = !windowWireframe;
                     if (windowWireframe) {
                         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -63,6 +76,20 @@ public class Engine {
         windowHeight = height;
         glViewport(0,0,windowWidth,windowWidth);
     }
+    private void onCursorPosition(long window, double x, double y) {
+        if (windowLocked == false) return;
+        camera.onCursorPosition(x, y);
+    }
+    private void onMouseButton(long window, int button, int action, int mods) {
+        if (action == GLFW_PRESS) {
+            if (windowLocked == false) {
+                windowLocked = true;
+
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                glfwFocusWindow(window);
+            }
+        }
+    }
 
     // frame rate
     private double fpsPreviousSeconds = 0.0;
@@ -77,9 +104,8 @@ public class Engine {
             double fps = fpsFrameCount/elapsedSeconds;
             double msPerFrame = 1000.0/fps;
 
-            glfwSetWindowTitle(window, WINDOW_TITLE+" - FPS: "+
-                    String.format("%.2f", fps)+" - Frame Time: "+
-                    String.format("%.2f", msPerFrame)+" (ms)");
+            glfwSetWindowTitle(window, WINDOW_TITLE+" ("+String.format("%.2f", fps)+" fps)");
+                //"Frame Time: "+ String.format("%.2f", msPerFrame)+" (ms)";
 
             fpsFrameCount = 0;
         }
@@ -99,20 +125,35 @@ public class Engine {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         window = glfwCreateWindow(windowWidth, windowHeight, WINDOW_TITLE, NULL, NULL);
-
         if (window == NULL) {
             glfwTerminate();
             throw new IllegalStateException("Failed to create GLFW window");
         }
 
+        long monitor = glfwGetPrimaryMonitor();
+        GLFWVidMode videoMode = glfwGetVideoMode(monitor);
+
+        glfwSetWindowPos(window,
+            videoMode.width()/2-windowWidth/2,
+            videoMode.height()/2-windowHeight/2
+        );
+
+        glfwSetCursorPos(window, 0, 0);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwFocusWindow(window);
+
         glfwSetKeyCallback(window, this::onKey);
         glfwSetFramebufferSizeCallback(window, this::onFrameBufferSize);
+        glfwSetCursorPosCallback(window, this::onCursorPosition);
+        glfwSetMouseButtonCallback(window, this::onMouseButton);
 
         glfwMakeContextCurrent(window);
 
         GL.createCapabilities();
 
         glClearColor(1.0f, 0.0f, 0.5f, 0.0f);
+        //glClearColor(0.611764706f, 0.654901961f, 0.658823529f, 0.0f);
+
         glEnable(GL_DEPTH_TEST);
 
         // disable anti aliasing
@@ -125,6 +166,9 @@ public class Engine {
         glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
         glDisable(GL_MULTISAMPLE);
     }
+    private void init() {
+        initOpenGL();
+    }
 
     // updating functions
     private void draw() {
@@ -132,22 +176,23 @@ public class Engine {
     }
 
     private void update() throws IOException {
-        // models
-        Model vulpieModel = new Model(GL_STATIC_DRAW);
-        vulpieModel.loadObj("models/vulpie.obj");
-        vulpieModel.make();
+        // entities
+        Entity vulpie = new Entity();
+        vulpie.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
 
-        Vector3f vulpiePosition = new Vector3f(0,0,-3);
-        float vulpieRotation = 0;
-
-        // textures
-        Texture vulpieTexture = new Texture("textures/vulpie.jpg");
+        Entity floor = new Entity();
+        floor.loadObjWithTexture("models/floor.obj", "textures/floor.jpg");
 
         // shaders
-        Shader shader = new Shader();
-        shader.addShader("shaders/vertexShader.vs", GL_VERTEX_SHADER);
-        shader.addShader("shaders/fragShader.fs", GL_FRAGMENT_SHADER);
-        shader.createProgram();
+        Shader standard = new Shader();
+        standard.addShader("shaders/standard.vs", GL_VERTEX_SHADER);
+        standard.addShader("shaders/standard.fs", GL_FRAGMENT_SHADER);
+        standard.createProgram();
+
+        Shader cute = new Shader();
+        cute.addShader("shaders/standard.vs", GL_VERTEX_SHADER);
+        cute.addShader("shaders/cute.fs", GL_FRAGMENT_SHADER);
+        cute.createProgram();
 
         // loop
         double lastTime = glfwGetTime();
@@ -156,46 +201,46 @@ public class Engine {
             glfwPollEvents();
 
             double currentTime = glfwGetTime();
-            double deltaTime = currentTime - lastTime;
+            double dt = currentTime - lastTime;
             lastTime = currentTime;
 
             showFPS();
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            vulpieTexture.bind();
+            vulpie.position.set(
+                (float)(Math.sin(currentTime*2)),
+                (float)(Math.sin(currentTime*8)*0.1 + 0.1),
+                (float)(Math.cos(currentTime*4)*0.1)
+            );
+            vulpie.rotation.set(
+                0,
+                (float)(Math.sin(currentTime*16)*0.25),
+                (float)(Math.cos(currentTime*8)*0.25)
+            );
 
-            vulpieRotation += (float)(deltaTime*Math.toRadians(90));
-            if (vulpieRotation >= 360) vulpieRotation -= 360;
+            camera.update((float)dt);
 
-            Matrix4f model = new Matrix4f();
-            Matrix4f view = new Matrix4f();
-            Matrix4f projection = new Matrix4f();
+            standard.use();
+            standard.setUniform("iTime", (float)currentTime);
+            standard.setUniform("view", camera.view);
+            standard.setUniform("projection", camera.projection);
+            vulpie.draw(standard);
 
-            model.translate(vulpiePosition);
-            model.rotate(vulpieRotation,0,1,0);
-
-            Vector3f camPos = new Vector3f(0,0.08f,0);
-            Vector3f camTarget= new Vector3f(0,0,-1);
-            Vector3f camUp = new Vector3f(0,1,0);
-
-            view.lookAt(camPos, camTarget, camUp);
-
-            projection.perspective((float)Math.toRadians(45),windowWidth/windowHeight,0.1f,100);
-            
-            shader.use();
-            shader.setUniform("iTime", (float)currentTime);
-            shader.setUniform("model", model);
-            shader.setUniform("view", view);
-            shader.setUniform("projection", projection);
-
-            vulpieModel.draw();
+            cute.use();
+            cute.setUniform("iTime", (float)currentTime);
+            cute.setUniform("view", camera.view);
+            cute.setUniform("projection", camera.projection);
+            floor.draw(cute);
 
             glfwSwapBuffers(window);
         }
 
-        shader.cleanup();
-        vulpieModel.cleanup();
+        standard.cleanup();
+        cute.cleanup();
+
+        vulpie.cleanup();
+        floor.cleanup();
     }
 
     // de-initialization
@@ -204,7 +249,7 @@ public class Engine {
     }
 
     public void run(Engine engine) throws IOException {
-        engine.initOpenGL();
+        engine.init();
         engine.update();
         engine.deinit();
     }
