@@ -1,3 +1,5 @@
+package Engine;
+
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -5,6 +7,7 @@ import org.lwjgl.BufferUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,11 +46,11 @@ public class Model {
         addVertex(v3, uv3);
     }
 
-    public void loadObj(String filename) throws IOException {
+    public void loadObj(String filename) throws IOException, URISyntaxException {
         // definitely not the best way lol, but assimp is a little tricky to use.
         // ill have to look into it another time once i have scenes.
 
-        String obj = new String(Flutterverse.class.getResourceAsStream(filename).readAllBytes());
+        String obj = Utils.loadFile(filename);
         BufferedReader reader = new BufferedReader(new StringReader(obj));
 
         List<Vector3f> pos = new ArrayList<>();

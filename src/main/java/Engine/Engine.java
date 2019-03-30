@@ -1,13 +1,19 @@
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+package Engine;
+
+import com.sun.org.apache.xpath.internal.functions.Function;
+import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.Callback;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.opengl.GL33.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -23,7 +29,7 @@ public class Engine {
     private boolean windowWireframe = false;
     private boolean windowLocked = true;
 
-    private Camera camera = new Camera();
+    public Camera camera = new Camera();
 
     // glfw handling
     private void onKey(long window, int key, int scancode, int action, int mode) {
@@ -102,7 +108,7 @@ public class Engine {
         if (elapsedSeconds > 0.25) {
             fpsPreviousSeconds = currentSeconds;
             double fps = fpsFrameCount/elapsedSeconds;
-            double msPerFrame = 1000.0/fps;
+            //double msPerFrame = 1000.0/fps;
 
             glfwSetWindowTitle(window, WINDOW_TITLE+" ("+String.format("%.2f", fps)+" fps)");
                 //"Frame Time: "+ String.format("%.2f", msPerFrame)+" (ms)";
@@ -114,7 +120,7 @@ public class Engine {
     }
 
     // initialization
-    private void initOpenGL() {
+    private void initOpenGL() throws IOException {
         if (!glfwInit())
             throw new IllegalStateException("GLFW initialization failed");
 
@@ -147,6 +153,13 @@ public class Engine {
         glfwSetCursorPosCallback(window, this::onCursorPosition);
         glfwSetMouseButtonCallback(window, this::onMouseButton);
 
+        GLFWImage icon = GLFWImage.malloc();
+        GLFWImage.Buffer iconBuffer = GLFWImage.malloc(1);
+        ImageData iconData = new ImageData("images/icon.png");
+        icon.set(iconData.width, iconData.height, iconData.data);
+        iconBuffer.put(0, icon);
+        glfwSetWindowIcon(window, iconBuffer);
+
         glfwMakeContextCurrent(window);
 
         GL.createCapabilities();
@@ -166,81 +179,63 @@ public class Engine {
         glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
         glDisable(GL_MULTISAMPLE);
     }
-    private void init() {
+    private void init() throws IOException {
         initOpenGL();
     }
 
     // updating functions
-    private void draw() {
+    private void update() throws IOException, URISyntaxException {
+        Scene scene = new Scene();
 
-    }
-
-    private void update() throws IOException {
-        // entities
+        // vulpie
         Entity vulpie = new Entity();
+        vulpie.name = "Vulpie";
         vulpie.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
+        scene.addEntity(vulpie);
 
-        Entity floor = new Entity();
-        floor.loadObjWithTexture("models/floor.obj", "textures/floor.jpg");
-
-        // shaders
-        Shader standard = new Shader();
-        standard.addShader("shaders/standard.vs", GL_VERTEX_SHADER);
-        standard.addShader("shaders/standard.fs", GL_FRAGMENT_SHADER);
-        standard.createProgram();
-
+        // floor
         Shader cute = new Shader();
+        cute.name = "Cute";
         cute.addShader("shaders/standard.vs", GL_VERTEX_SHADER);
         cute.addShader("shaders/cute.fs", GL_FRAGMENT_SHADER);
         cute.createProgram();
 
-        // loop
-        double lastTime = glfwGetTime();
+        Entity floor = new Entity();
+        floor.name = "Floor";
+        floor.loadObj("models/floor.obj");
+        scene.addEntity(floor, scene.addShader(cute));
 
+        // loop
+        float lastTime = (float)glfwGetTime();
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
 
-            double currentTime = glfwGetTime();
-            double dt = currentTime - lastTime;
-            lastTime = currentTime;
+            float time = (float)glfwGetTime();
+            float dt = time - lastTime;
+            lastTime = time;
 
             showFPS();
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             vulpie.position.set(
-                (float)(Math.sin(currentTime*2)),
-                (float)(Math.sin(currentTime*8)*0.1 + 0.1),
-                (float)(Math.cos(currentTime*4)*0.1)
+                (float)(Math.sin(time*2)),
+                (float)(Math.sin(time*8)*0.1 + 0.1),
+                (float)(Math.cos(time*4)*0.1)
             );
             vulpie.rotation.set(
                 0,
-                (float)(Math.sin(currentTime*16)*0.25),
-                (float)(Math.cos(currentTime*8)*0.25)
+                (float)(Math.sin(time*16)*0.25),
+                (float)(Math.cos(time*8)*0.25)
             );
 
-            camera.update((float)dt);
-
-            standard.use();
-            standard.setUniform("iTime", (float)currentTime);
-            standard.setUniform("view", camera.view);
-            standard.setUniform("projection", camera.projection);
-            vulpie.draw(standard);
-
-            cute.use();
-            cute.setUniform("iTime", (float)currentTime);
-            cute.setUniform("view", camera.view);
-            cute.setUniform("projection", camera.projection);
-            floor.draw(cute);
+            camera.update(dt);
+            scene.update(camera, time);
 
             glfwSwapBuffers(window);
         }
 
-        standard.cleanup();
-        cute.cleanup();
-
-        vulpie.cleanup();
-        floor.cleanup();
+        scene.cleanup();
     }
 
     // de-initialization
@@ -248,7 +243,7 @@ public class Engine {
         glfwTerminate();
     }
 
-    public void run(Engine engine) throws IOException {
+    public void run(Engine engine) throws IOException, URISyntaxException {
         engine.init();
         engine.update();
         engine.deinit();

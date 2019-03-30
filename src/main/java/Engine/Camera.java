@@ -1,3 +1,5 @@
+package Engine;
+
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
@@ -61,6 +63,7 @@ public class Camera {
     }
 
     public void update(float dt) {
+
         float moveSpeed = speed*dt;
 
         int forward = (keys.get('s')?1:0)-(keys.get('w')?1:0);
@@ -89,22 +92,5 @@ public class Camera {
         Matrix4f translate = new Matrix4f().translate(new Vector3f(position).negate());
 
         view = rotate.mul(translate);
-
-//        position.add(
-//            (keys.get('d')?move:0)-(keys.get('a')?move:0),
-//            0,
-//            (keys.get('s')?move:0)-(keys.get('w')?move:0)
-//        );
-//
-//        Vector3f normalizedRotation = rotation;
-//        Vector3f targetPos = new Vector3f(position).add(normalizedRotation);
-//
-//        System.out.println(normalizedRotation);
-//
-//        view = new Matrix4f().lookAt(position, targetPos, targetUp);
     }
-
-//    public Matrix4f getViewMatrix() {
-//        return new Matrix4f().lookAt(position, targetPos, up);
-//    }
 }

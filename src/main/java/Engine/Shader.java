@@ -1,3 +1,5 @@
+package Engine;
+
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -16,18 +18,18 @@ import java.util.regex.Pattern;
 import static org.lwjgl.opengl.GL33.*;
 
 public class Shader {
-    public int createShader(String filename, int type) throws IOException {
-        String content = new String(Flutterverse.class.getResourceAsStream(filename).readAllBytes());
+    public String name = "Shader";
+
+    public int createShader(String filename, int type) throws IOException, URISyntaxException {
+        String content = Utils.loadFile(filename);
 
         // fill in references
         Pattern referencePattern = Pattern.compile("// <reference path=\"(.*?)\"/>");
-        content = referencePattern.matcher(content).replaceAll((match) -> {
-            try {
-                return new String(Flutterverse.class.getResourceAsStream(match.group(1)).readAllBytes());
-            } catch (IOException e) {
-                return "";
-            }
-        });
+        Matcher matcher = referencePattern.matcher(content);
+
+        while (matcher.find()) {
+            content = matcher.replaceFirst(Utils.loadFile(matcher.group(1)));
+        }
 
         // glsl things
         int shader = glCreateShader(type);
@@ -64,7 +66,7 @@ public class Shader {
     public int program;
     private List<Integer> shaders = new ArrayList<>();
 
-    public void addShader(String filename, int type) throws IOException {
+    public void addShader(String filename, int type) throws IOException, URISyntaxException {
         int shader = createShader(filename, type);
         shaders.add(shader);
     }

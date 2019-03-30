@@ -1,37 +1,43 @@
+package Engine;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 
 public class Entity {
 
+    public String name = "Entity";
+
     public Model model;
-    //public Shader shader;
-    public Texture texture;
+    //public Engine.Shader shader;
+    public Texture2D texture;
 
     public Vector3f position = new Vector3f(0,0,0);
     public Vector3f rotation = new Vector3f(0,0,0);
     //public Quaternionf rotation = new Quaternionf(0,0,0,0);
 
-    public void loadObjWithTexture(String objFilename, String texFilename) throws IOException {
+    public void loadObjWithTexture(String objFilename, String texFilename) throws IOException, URISyntaxException {
         model = new Model(GL_STATIC_DRAW);
         model.loadObj(objFilename);
         model.make();
 
-        texture = new Texture(texFilename);
+        texture = new Texture2D(texFilename);
     }
 
-    public void loadObj(String objFilename) throws IOException {
+    public void loadObj(String objFilename) throws IOException, URISyntaxException {
         model = new Model(GL_STATIC_DRAW);
         model.loadObj(objFilename);
+        model.make();
     }
 
     public void draw(Shader shader) {
-        if (model == null) throw new AssertionError("Model not assigned to Entity");
-        //if (shader == null) throw new AssertionError("Shader not assigned to Entity");
-        //if (texture == null) throw new AssertionError("Texture not assigned to Entity");
+        if (model == null) throw new AssertionError("Engine.Model not assigned to Engine.Entity");
+        //if (shader == null) throw new AssertionError("Engine.Shader not assigned to Engine.Entity");
+        //if (texture == null) throw new AssertionError("Engine.Texture2D not assigned to Engine.Entity");
 
         Matrix4f modelMatrix = new Matrix4f();
         modelMatrix.translate(position);
