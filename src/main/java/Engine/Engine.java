@@ -184,10 +184,9 @@ public class Engine {
         Scene scene = new Scene();
 
         // vulpie
-        Entity vulpie = new Entity();
+        Entity vulpie = scene.createEntity();
         vulpie.name = "Vulpie";
         vulpie.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
-        scene.addEntity(vulpie);
 
         // floor
         Shader cute = new Shader();

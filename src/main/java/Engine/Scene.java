@@ -12,12 +12,22 @@ public class Scene {
     private List<Shader> shaders = new ArrayList<Shader>();
     private List<List<Entity>> entities = new ArrayList<List<Entity>>();
 
-    public void addEntity(Entity entity) {
-        entities.get(0).add(entity);
-    }
-
     public void addEntity(Entity entity, int shaderIndex) {
         entities.get(shaderIndex).add(entity);
+    }
+
+    public void addEntity(Entity entity) {
+        addEntity(entity, 0);
+    }
+
+    public Entity createEntity(int shaderIndex) {
+        Entity entity = new Entity();
+        addEntity(entity);
+        return entity;
+    }
+
+    public Entity createEntity() {
+        return createEntity(0);
     }
 
     public int addShader(Shader shader) {

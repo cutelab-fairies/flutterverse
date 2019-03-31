@@ -55,6 +55,24 @@ public class Mesh {
         addVertex(v3, uv3);
     }
 
+    public void addQuad(
+        Vector3f v1, Vector2f uv1,
+        Vector3f v2, Vector2f uv2,
+        Vector3f v3, Vector2f uv3,
+        Vector3f v4, Vector2f uv4
+    ) {
+        addTriangle(
+            v1, uv1,
+            v2, uv2,
+            v3, uv3
+        );
+        addTriangle(
+            v1, uv1,
+            v3, uv3,
+            v4, uv4
+        );
+    }
+
     public void loadObj(String filename) throws IOException {
         // definitely not the best way lol, but assimp is a little tricky to use.
         // ill have to look into it another time once i have scenes.
