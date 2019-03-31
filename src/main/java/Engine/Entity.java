@@ -6,13 +6,13 @@ import org.joml.Vector3f;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL46.GL_STATIC_DRAW;
 
 public class Entity {
 
     public String name = "Entity";
 
-    public Model model;
+    public Mesh model;
     //public Engine.Shader shader;
     public Texture2D texture;
 
@@ -21,7 +21,7 @@ public class Entity {
     //public Quaternionf rotation = new Quaternionf(0,0,0,0);
 
     public void loadObjWithTexture(String objFilename, String texFilename) throws IOException, URISyntaxException {
-        model = new Model(GL_STATIC_DRAW);
+        model = new Mesh(GL_STATIC_DRAW);
         model.loadObj(objFilename);
         model.make();
 
@@ -29,13 +29,13 @@ public class Entity {
     }
 
     public void loadObj(String objFilename) throws IOException, URISyntaxException {
-        model = new Model(GL_STATIC_DRAW);
+        model = new Mesh(GL_STATIC_DRAW);
         model.loadObj(objFilename);
         model.make();
     }
 
     public void draw(Shader shader) {
-        if (model == null) throw new AssertionError("Engine.Model not assigned to Engine.Entity");
+        if (model == null) throw new AssertionError("Engine.Mesh not assigned to Engine.Entity");
         //if (shader == null) throw new AssertionError("Engine.Shader not assigned to Engine.Entity");
         //if (texture == null) throw new AssertionError("Engine.Texture2D not assigned to Engine.Entity");
 

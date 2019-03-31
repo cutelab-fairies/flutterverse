@@ -17,8 +17,12 @@ public class Utils {
         return classLoader;
     }
 
+    public static InputStream loadFileInputStream(String filename) throws IOException {
+        return getMainClass().getResourceAsStream(filename);
+    }
+
     public static String loadFile(String filename) throws IOException {
-        InputStream stream = getMainClass().getResourceAsStream(filename);
+        InputStream stream = loadFileInputStream(filename);
 
         int ch;
         StringBuilder builder = new StringBuilder();
@@ -30,7 +34,7 @@ public class Utils {
     }
 
     public static ByteBuffer loadFileByteBuffer(String filename) throws IOException {
-        InputStream stream = getMainClass().getResourceAsStream(filename);
+        InputStream stream = loadFileInputStream(filename);
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 

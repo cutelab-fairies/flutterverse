@@ -3,7 +3,7 @@ package Engine;
 import java.io.*;
 import java.net.URISyntaxException;
 
-import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.opengl.GL46.*;
 
 public class Texture2D {
 

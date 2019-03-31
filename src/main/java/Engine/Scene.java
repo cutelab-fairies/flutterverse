@@ -5,8 +5,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL46.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL46.GL_VERTEX_SHADER;
 
 public class Scene {
     private List<Shader> shaders = new ArrayList<Shader>();
@@ -48,6 +48,7 @@ public class Scene {
         for (int shaderIndex=0; shaderIndex<entities.size(); shaderIndex++) {
             // cleanup shader
             shaders.get(shaderIndex).cleanup();
+
             // cleanup all entities attached to shader
             for (Entity entity: entities.get(shaderIndex)) {
                 entity.cleanup();

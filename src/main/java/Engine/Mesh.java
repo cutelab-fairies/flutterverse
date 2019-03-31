@@ -1,5 +1,10 @@
 package Engine;
 
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.GltfModels;
+import de.javagl.jgltf.model.io.GltfAsset;
+import de.javagl.jgltf.model.io.GltfAssetReader;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -7,14 +12,18 @@ import org.lwjgl.BufferUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.opengl.GL46.*;
 
-public class Model {
+import de.javagl.jgltf.*;
+
+import javax.rmi.CORBA.Util;
+
+public class Mesh {
     private int bufferUsage;
 
     // open gl stuff
@@ -46,7 +55,7 @@ public class Model {
         addVertex(v3, uv3);
     }
 
-    public void loadObj(String filename) throws IOException, URISyntaxException {
+    public void loadObj(String filename) throws IOException {
         // definitely not the best way lol, but assimp is a little tricky to use.
         // ill have to look into it another time once i have scenes.
 
@@ -157,7 +166,7 @@ public class Model {
         glDeleteBuffers(uvVbo);
     }
 
-    public Model(int bufferUsage) {
+    public Mesh(int bufferUsage) {
         this.bufferUsage = bufferUsage;
     }
 }

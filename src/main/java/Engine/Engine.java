@@ -1,20 +1,14 @@
 package Engine;
 
-import com.sun.org.apache.xpath.internal.functions.Function;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.Callback;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
-import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
-import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.opengl.GL46.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Engine {
@@ -22,14 +16,14 @@ public class Engine {
 
     private long window;
 
-    private int windowWidth = 512;
-    private int windowHeight = 512;
+    private int windowWidth = 1280;
+    private int windowHeight = 720;
 
     private boolean windowFullscreen = false;
     private boolean windowWireframe = false;
     private boolean windowLocked = true;
 
-    public Camera camera = new Camera();
+    public Camera camera = new Camera(windowWidth, windowHeight);
 
     // glfw handling
     private void onKey(long window, int key, int scancode, int action, int mode) {
@@ -80,7 +74,8 @@ public class Engine {
     private void onFrameBufferSize(long window, int width, int height) {
         windowWidth = width;
         windowHeight = height;
-        glViewport(0,0,windowWidth,windowWidth);
+        glViewport(0,0,windowWidth,windowHeight);
+        camera.onFrameBufferSize(window, windowWidth, windowHeight);
     }
     private void onCursorPosition(long window, double x, double y) {
         if (windowLocked == false) return;
@@ -92,6 +87,7 @@ public class Engine {
                 windowLocked = true;
 
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
                 glfwFocusWindow(window);
             }
         }
@@ -124,11 +120,11 @@ public class Engine {
         if (!glfwInit())
             throw new IllegalStateException("GLFW initialization failed");
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
         window = glfwCreateWindow(windowWidth, windowHeight, WINDOW_TITLE, NULL, NULL);
         if (window == NULL) {
@@ -144,8 +140,9 @@ public class Engine {
             videoMode.height()/2-windowHeight/2
         );
 
-        glfwSetCursorPos(window, 0, 0);
+        // hides and focues
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
         glfwFocusWindow(window);
 
         glfwSetKeyCallback(window, this::onKey);
@@ -164,9 +161,8 @@ public class Engine {
 
         GL.createCapabilities();
 
+        glViewport(0,0,windowWidth,windowHeight);
         glClearColor(1.0f, 0.0f, 0.5f, 0.0f);
-        //glClearColor(0.611764706f, 0.654901961f, 0.658823529f, 0.0f);
-
         glEnable(GL_DEPTH_TEST);
 
         // disable anti aliasing
@@ -244,6 +240,7 @@ public class Engine {
     }
 
     public void run(Engine engine) throws IOException, URISyntaxException {
+        System.out.println("Starting the Flutterverse engine!");
         engine.init();
         engine.update();
         engine.deinit();

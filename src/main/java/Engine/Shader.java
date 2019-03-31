@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.opengl.GL46.*;
 
 public class Shader {
     public String name = "Shader";
