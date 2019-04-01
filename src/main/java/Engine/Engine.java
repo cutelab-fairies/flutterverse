@@ -175,6 +175,7 @@ public class Engine {
         glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
         glDisable(GL_MULTISAMPLE);
     }
+
     private void init() throws IOException {
         initOpenGL();
     }
@@ -183,10 +184,15 @@ public class Engine {
     private void update() throws IOException, URISyntaxException {
         Scene scene = new Scene();
 
-        // vulpie
-        Entity vulpie = scene.createEntity();
-        vulpie.name = "Vulpie";
-        vulpie.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
+        // vulpies
+        Entity[] vulpies = new Entity[4];
+        
+        for (int i=0; i<vulpies.length; i++) {
+            Entity vulpie = scene.createEntity();
+            vulpie.name = "Vulpie";
+            vulpie.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
+            vulpies[i] = vulpie;
+        }
 
         // floor
         Shader cute = new Shader();
@@ -213,16 +219,22 @@ public class Engine {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            vulpie.position.set(
-                (float)(Math.sin(time*2)),
-                (float)(Math.sin(time*8)*0.1 + 0.1),
-                (float)(Math.cos(time*4)*0.1)
-            );
-            vulpie.rotation.set(
-                0,
-                (float)(Math.sin(time*16)*0.25),
-                (float)(Math.cos(time*8)*0.25)
-            );
+            for (int i=0; i<vulpies.length; i++) {
+                float oTime = time + (float)i*0.2f;
+                float oX = (i-1.5f)*1.5f;
+
+                vulpies[i].position
+                    .set(
+                    (float) (Math.sin(oTime * 8)*0.1f + 0.1f)+oX,
+                    0, //(float) (Math.sin(oTime * 2)*0.1f + 0.1f),
+                    (float) (Math.cos(oTime * 4)*0.4f)
+                );
+                vulpies[i].rotation.set(
+                    0,
+                    (float) (Math.sin(oTime * 16) * 0.25),
+                    (float) (Math.cos(oTime * 8) * 0.25)
+                );
+            }
 
             camera.update(dt);
             scene.update(camera, time);
@@ -233,15 +245,20 @@ public class Engine {
         scene.cleanup();
     }
 
+
     // de-initialization
     private void deinit() {
         glfwTerminate();
     }
 
-    public void run(Engine engine) throws IOException, URISyntaxException {
+    public void run() throws IOException, URISyntaxException {
         System.out.println("Starting the Flutterverse engine!");
-        engine.init();
-        engine.update();
-        engine.deinit();
+        init();
+        update();
+        deinit();
+    }
+
+    public Engine() {
+
     }
 }

@@ -11,11 +11,11 @@ import static org.lwjgl.opengl.GL46.GL_VERTEX_SHADER;
 public class Scene {
     private List<Shader> shaders = new ArrayList<Shader>();
     private List<List<Entity>> entities = new ArrayList<List<Entity>>();
+    //private Map test = new HashMap<Shader, Entity>();
 
     public void addEntity(Entity entity, int shaderIndex) {
         entities.get(shaderIndex).add(entity);
     }
-
     public void addEntity(Entity entity) {
         addEntity(entity, 0);
     }

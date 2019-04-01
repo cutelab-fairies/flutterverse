@@ -1,10 +1,5 @@
 package Engine;
 
-import de.javagl.jgltf.impl.v1.GlTF;
-import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfModels;
-import de.javagl.jgltf.model.io.GltfAsset;
-import de.javagl.jgltf.model.io.GltfAssetReader;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -12,16 +7,11 @@ import org.lwjgl.BufferUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL46.*;
-
-import de.javagl.jgltf.*;
-
-import javax.rmi.CORBA.Util;
 
 public class Mesh {
     private int bufferUsage;

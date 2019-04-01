@@ -14,9 +14,9 @@ void main() {
 	// cute snoise
 
 	vec2 uv = iUV;
-	uv *= 256;
-	uv = round(uv);
-	uv /= 256;
+	//uv *= 256;
+	//uv = round(uv);
+	//uv /= 256;
 
 	float r = snoise(vec3(uv*8, iTime*0.5));
 	r = r*0.5 + 0.5;
