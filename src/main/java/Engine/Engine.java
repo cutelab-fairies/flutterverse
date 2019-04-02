@@ -184,7 +184,7 @@ public class Engine {
 
     // updating functions
     private void update() throws IOException, URISyntaxException {
-        Scene scene = new Scene();
+        //Scene scene = new Scene();
 
         // vulpies
         //Entity vulpie = scene.createEntity();
@@ -192,27 +192,27 @@ public class Engine {
         //vulpie.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
 
         // floor
-        Shader cute = new Shader();
-        cute.name = "Cute";
-        cute.addShader("shaders/standard.vs", GL_VERTEX_SHADER);
-        cute.addShader("shaders/cute.fs", GL_FRAGMENT_SHADER);
-        cute.createProgram();
-
-        Entity floor = new Entity();
-        floor.name = "Floor";
-        floor.loadObj("models/floor.obj");
-        scene.addEntity(floor, scene.addShader(cute));
+        //Shader cute = new Shader();
+        //cute.name = "Cute";
+        //cute.addShader("shaders/standard.vs", GL_VERTEX_SHADER);
+        //cute.addShader("shaders/cute.fs", GL_FRAGMENT_SHADER);
+        //cute.createProgram();
+//
+        //Entity floor = new Entity();
+        //floor.name = "Floor";
+        //floor.loadObj("models/floor.obj");
+        //scene.addEntity(floor, scene.addShader(cute));
 
         // networking
-        Scene networkScene = new Scene();
-        List<Entity> playerEntities = new ArrayList<>();
-        for (int i=0; i<4; i++) {
-            Entity playerEntity = scene.createEntity();
-            playerEntity.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
-            playerEntities.add(playerEntity);
-        }
-
-        NetworkClient networkClient = new NetworkClient(camera, playerEntities);
+        //Scene networkScene = new Scene();
+        //List<Entity> playerEntities = new ArrayList<>();
+        //for (int i=0; i<4; i++) {
+        //    Entity playerEntity = scene.createEntity();
+        //    playerEntity.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
+        //    playerEntities.add(playerEntity);
+        //}
+//
+        //NetworkClient networkClient = new NetworkClient(camera, playerEntities);
 
         // loop
         float lastTime = (float)glfwGetTime();
@@ -240,15 +240,15 @@ public class Engine {
             //);
 
             camera.update(dt);
-            scene.update(camera, time);
-            networkScene.update(camera, time);
+            //scene.update(camera, time);
+            //networkScene.update(camera, time);
 
             glfwSwapBuffers(window);
         }
 
-        scene.cleanup();
-        networkScene.cleanup();
-        networkClient.cleanup();
+        //scene.cleanup();
+        //networkScene.cleanup();
+        //networkClient.cleanup();
     }
 
 
