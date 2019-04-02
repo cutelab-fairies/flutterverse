@@ -13,7 +13,7 @@ pipeline {
     }
     stage('Deliver') {
       steps {
-        sh 'mvn jar:jar install:install help:evaluate -Dexpression=project.name'
+        archiveArtifacts 'target/flutterverse-1.0-SNAPSHOT.jar'
       }
     }
   }
