@@ -9,7 +9,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class Camera {
 
     public float speed = 4f;
-    public float friction = 0.995f;
+    public float friction = 0.95f;
     public float sensetivity = 12f;
 
     public Vector2f rotation = new Vector2f(0,0); // yaw pitch
@@ -80,8 +80,8 @@ public class Camera {
         if (keyDown[GLFW_KEY_S])     dir.add( 0, 0, 1);
         if (keyDown[GLFW_KEY_A])     dir.add(-1, 0, 0);
         if (keyDown[GLFW_KEY_D])     dir.add( 1, 0, 0);
-        if (keyDown[GLFW_KEY_C])     dir.add( 0,-1, 0);
-        if (keyDown[GLFW_KEY_SPACE]) dir.add( 0, 1, 0);
+        //if (keyDown[GLFW_KEY_C])     dir.add( 0,-1, 0);
+        //if (keyDown[GLFW_KEY_SPACE]) dir.add( 0, 1, 0);
         if (dir.length()>0) {
             dir.normalize(1);
             dir.rotateAxis(rotation.x, 0,-1,0);
