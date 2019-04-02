@@ -27,8 +27,8 @@ public class Mesh {
 
     // my model stuff
     private int vertexCount;
-    List<Vector3f> pos = new ArrayList<>();
-    List<Vector2f> uv = new ArrayList<>();
+    private List<Vector3f> pos = new ArrayList<>();
+    private List<Vector2f> uv = new ArrayList<>();
 
     public void addVertex(Vector3f pos, Vector2f uv) {
         this.pos.add(pos);
