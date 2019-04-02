@@ -20,7 +20,7 @@ import static org.lwjgl.opengl.GL46.*;
 public class Shader {
     public String name = "Shader";
 
-    public int createShader(String filename, int type) throws IOException, URISyntaxException {
+    public int createShader(String filename, int type) throws IOException {
         String content = Utils.loadFile(filename);
 
         // fill in references
@@ -66,7 +66,7 @@ public class Shader {
     public int program;
     private List<Integer> shaders = new ArrayList<>();
 
-    public void addShader(String filename, int type) throws IOException, URISyntaxException {
+    public void addShader(String filename, int type) throws IOException {
         int shader = createShader(filename, type);
         shaders.add(shader);
     }

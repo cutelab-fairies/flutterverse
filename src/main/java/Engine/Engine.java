@@ -14,10 +14,9 @@ import static org.lwjgl.opengl.GL46.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Engine {
-    private String WINDOW_TITLE = "Flutterverse: THE LIVING VULPIE SHADER MACHINE";
+    public long window;
 
-    private long window;
-
+    private String windowTitle = "Flutterverse: THE VULPIE VORTEX SHADER MACHINE";
     private int windowWidth = 1280;
     private int windowHeight = 720;
 
@@ -108,7 +107,7 @@ public class Engine {
             double fps = fpsFrameCount/elapsedSeconds;
             //double msPerFrame = 1000.0/fps;
 
-            glfwSetWindowTitle(window, WINDOW_TITLE+" ("+String.format("%.2f", fps)+" fps)");
+            glfwSetWindowTitle(window, windowTitle+" ("+String.format("%.2f", fps)+" fps)");
                 //"Frame Time: "+ String.format("%.2f", msPerFrame)+" (ms)";
 
             fpsFrameCount = 0;
@@ -128,7 +127,7 @@ public class Engine {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        window = glfwCreateWindow(windowWidth, windowHeight, WINDOW_TITLE, NULL, NULL);
+        window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, NULL, NULL);
         if (window == NULL) {
             glfwTerminate();
             throw new IllegalStateException("Failed to create GLFW window");
@@ -178,41 +177,22 @@ public class Engine {
         glDisable(GL_MULTISAMPLE);
     }
 
-    private void init() throws IOException {
+    private void init() throws IOException, URISyntaxException {
         initOpenGL();
+        onInit();
     }
 
     // updating functions
-    private void update() throws IOException, URISyntaxException {
-        //Scene scene = new Scene();
-
-        // vulpies
-        //Entity vulpie = scene.createEntity();
-        //vulpie.name = "Vulpie";
-        //vulpie.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
-
-        // floor
-        //Shader cute = new Shader();
-        //cute.name = "Cute";
-        //cute.addShader("shaders/standard.vs", GL_VERTEX_SHADER);
-        //cute.addShader("shaders/cute.fs", GL_FRAGMENT_SHADER);
-        //cute.createProgram();
-//
-        //Entity floor = new Entity();
-        //floor.name = "Floor";
-        //floor.loadObj("models/floor.obj");
-        //scene.addEntity(floor, scene.addShader(cute));
-
+    private void update() {
         // networking
-        //Scene networkScene = new Scene();
-        //List<Entity> playerEntities = new ArrayList<>();
-        //for (int i=0; i<4; i++) {
-        //    Entity playerEntity = scene.createEntity();
-        //    playerEntity.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
-        //    playerEntities.add(playerEntity);
-        //}
-//
-        //NetworkClient networkClient = new NetworkClient(camera, playerEntities);
+//        Scene networkScene = new Scene();
+//        List<Entity> playerEntities = new ArrayList<>();
+//        for (int i=0; i<4; i++) {
+//            Entity playerEntity = networkScene.createEntity();
+//            playerEntity.loadObjWithTexture("models/vulpie.obj", "textures/vulpie.jpg");
+//            playerEntities.add(playerEntity);
+//        }
+//        NetworkClient networkClient = new NetworkClient(camera, playerEntities);
 
         // loop
         float lastTime = (float)glfwGetTime();
@@ -226,36 +206,24 @@ public class Engine {
             showFPS();
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            //vulpie.position
-            //    .set(
-            //    (float) (Math.sin(time * 8)*0.1f + 0.1f),
-            //    0, //(float) (Math.sin(time * 2)*0.1f + 0.1f),
-            //    (float) (Math.cos(time * 4)*0.4f)
-            //);
-            //vulpie.rotation.set(
-            //    0,
-            //    (float) (Math.sin(time * 16) * 0.25),
-            //    (float) (Math.cos(time * 8) * 0.25)
-            //);
-
+            onUpdate(time, dt);
             camera.update(dt);
-            //scene.update(camera, time);
-            //networkScene.update(camera, time);
 
             glfwSwapBuffers(window);
         }
-
-        //scene.cleanup();
-        //networkScene.cleanup();
-        //networkClient.cleanup();
     }
 
 
     // de-initialization
     private void deinit() {
+        onDeinit();
         glfwTerminate();
     }
+
+    // handlers
+    public void onInit() throws IOException, URISyntaxException { }
+    public void onUpdate(float time, float dt) { }
+    public void onDeinit() { }
 
     public void run() throws IOException, URISyntaxException {
         System.out.println("Starting the Flutterverse engine!");

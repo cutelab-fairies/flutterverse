@@ -1,7 +1,8 @@
 #version 330 core
 
 in vec2 iUV;
-in vec3 iPosition;
+in vec3 iLocalPosition;
+in vec4 iWorldPosition;
 
 out vec4 frag_color;
 

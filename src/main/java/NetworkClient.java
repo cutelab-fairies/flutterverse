@@ -1,4 +1,5 @@
-package Engine;
+import Engine.Camera;
+import Engine.Entity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -82,11 +83,8 @@ public class NetworkClient extends Thread {
                     Float.parseFloat(info[2]),
                     Float.parseFloat(info[3])
                 );
-                entity.rotation.set(
-                    entity.rotation.x,
-                    (float)Math.PI-Float.parseFloat(info[4]),
-                    entity.rotation.z
-                );
+
+                //entity.rotation.setAngleAxis((float)Math.PI-Float.parseFloat(info[4]), 0,1,0);
             }
         }
     }

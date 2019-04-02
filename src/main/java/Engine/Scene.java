@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL46.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL46.GL_VERTEX_SHADER;
 
 public class Scene {
-    private List<Shader> shaders = new ArrayList<Shader>();
+    private List<Shader> shaders = new ArrayList<>();
     private List<List<Entity>> entities = new ArrayList<List<Entity>>();
     //private Map test = new HashMap<Shader, Entity>();
 
@@ -28,6 +28,36 @@ public class Scene {
 
     public Entity createEntity() {
         return createEntity(0);
+    }
+
+    public List<Entity> findEntities(String search) {
+        List<Entity> foundEntities = new ArrayList<>();
+
+        for (List<Entity> entitiesInShader: entities) {
+            for (Entity entity: entitiesInShader) {
+                if (entity.name.equalsIgnoreCase(search)) {
+                    foundEntities.add(entity);
+                }
+            }
+        }
+
+        return foundEntities;
+    }
+
+    public List<Entity> findEntities(int shaderIndex) {
+        return entities.get(shaderIndex);
+    }
+
+    public List<Shader> findShaders(String search) {
+        List<Shader> foundShaders = new ArrayList<>();
+
+        for (Shader shader: shaders) {
+            if (shader.name.equalsIgnoreCase(search)) {
+                foundShaders.add(shader);
+            }
+        }
+
+        return foundShaders;
     }
 
     public int addShader(Shader shader) {

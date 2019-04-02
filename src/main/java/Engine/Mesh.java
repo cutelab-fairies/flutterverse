@@ -25,7 +25,7 @@ public class Mesh {
     private FloatBuffer posVboBuffer;
     private FloatBuffer uvVboBuffer;
 
-    // my model stuff
+    // my mesh stuff
     private int vertexCount;
     private List<Vector3f> pos = new ArrayList<>();
     private List<Vector2f> uv = new ArrayList<>();
