@@ -8,12 +8,13 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'mvn -B -DskipTests clean package'
+        sh '''mvn -B -P windows package
+mvn -B -P linux package'''
       }
     }
     stage('Deliver') {
       steps {
-        archiveArtifacts 'target/flutterverse-1.0-SNAPSHOT.jar'
+        archiveArtifacts 'target/*.jar'
       }
     }
   }
