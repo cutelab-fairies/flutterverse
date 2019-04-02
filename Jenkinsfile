@@ -13,7 +13,7 @@ pipeline {
     }
     stage('Deliver') {
       steps {
-        sh './jenkins/scripts/deliver.sh'
+        sh 'mvn jar:jar install:install help:evaluate -Dexpression=project.name'
       }
     }
   }
